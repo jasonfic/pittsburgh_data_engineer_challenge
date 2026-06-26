@@ -14,11 +14,11 @@ models:
       This filter isolates established NHLers and removes extreme outliers, such as emergency backups or short-term 
       call-ups, whose limited sample sizes would skew rate-based efficiency metrics. It also follows the 
       qualification criteria for the Calder Memorial Trophy (i.e., 'rookie of the year' trophy), which
-      requires that elligible 'rookie' players participate in fewer than 25 games in previous seasons.
+      requires that eligible 'rookie' players participate in fewer than 25 games in previous seasons.
     columns:
       - name: nhl_player_id
         description: >
-          The unique numeric identification key assigned to each ndividual player by the NHL.
+          The unique numeric identification key assigned to each individual player by the NHL.
           This serves as the primary key for player tracking across all seasons of their career.
           The field is required and cannot be null.
         tests:
@@ -32,7 +32,8 @@ models:
       - name: position_group
         description: >
           The categorical role the player occupies on the ice. This divides skaters into 
-          'Forwards' (wingers/centers) and 'Defensemen'.
+          'Forwards' (wingers/centers), represented by the character 'F' and 'Defensemen',
+          represented by the character 'D'.
         tests:
           - not_null
           - accepted_values:
@@ -52,7 +53,7 @@ models:
       - name: career_assists
         description: >
           The cumulative sum of times this player assisted a goal scored by a teammate. 
-          A maximum of two assists (Primary and Secondary) an be awarded per goal; 
+          A maximum of two assists (Primary and Secondary) can be awarded per goal; 
           this metric captures the player's total involvement in setting up scores.
 
       - name: career_points
@@ -64,7 +65,7 @@ models:
           'Time On Ice' (TOI) expressed in total minutes, rounded to the nearest tenth. This measures 
           the exact cumulative duration of time the player was physically on the ice during active gametime.
           It converts raw tracking seconds into digestible minutes.
-          To be included in this model, players must have accumulated over 10,000 seconds (or 166.666 mimutes)
+          To be included in this model, players must have accumulated over 10,000 seconds (or 166.666 minutes)
           of total Time On Ice over the course of their career. This provides an additional layer of validation
           on top of the 'career_games_played > 25' filter.
         tests:

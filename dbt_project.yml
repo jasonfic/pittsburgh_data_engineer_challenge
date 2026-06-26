@@ -1,7 +1,7 @@
 # Jason Ficorilli | 6/26/2026
 
 # CREDITS: dbt model code adapted from dbt Cloud quickstart template for BigQuery
-# schema.yml descriptions adapted from Gemini output
+# schema.yml descriptions and project directory structure adapted from Gemini output
 
 name: "dim_skater_careers"
 version: "1.0.0"

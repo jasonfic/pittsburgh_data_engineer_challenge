@@ -7,7 +7,7 @@ WITH source_data AS (
         SUM(assists) AS career_assists, SUM(points) AS career_points,
         ROUND(SUM(toi_seconds) / 60.0, 1) AS career_toi_minutes,
         ROUND(SUM(points)/SUM(gp), 2) AS career_ppg
-    FROM `skater_seasons`
+    FROM {{ source('nhl_raw_data', 'skater_seasons') }}
     GROUP BY nhl_player_id, player_name, position_group
     HAVING SUM(toi_seconds) > 10000
 

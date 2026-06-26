@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: nhl_raw_data  # This acts as the internal dbt namespace/alias for your database schema
+    # database: <gcp_bq_id>  # The Google Cloud Platform project hosting the BigQuery instance where I stored the data for testing
+    schema: pens_interview_skater_seasons     # The actual schema or dataset name where the raw tables live
+    
+    loader: CSV_Upload # I loaded the data to BigQuery directly from the provided skater_seasons.csv file
+
+    description: >
+      This source contains raw, unaltered data ingested directly from a file provided by the Pittsburgh Penguins. 
+      It serves as the foundation for downstream dimension and fact models.
+
+    tables:
+      - name: skater_seasons  # The actual name of the physical table in your data warehouse
+        description: >
+          A historical log tracking individual player performance broken down by regular season year (2024-present).
+          Each row represents a player's aggregated stats for a single season with a specific team.
