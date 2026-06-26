@@ -1,17 +1,19 @@
 {{ config(materialized='table') }}
 
-with source_data as (
+WITH source_data AS (
 
-    SELECT DISTINCT nhl_player_id, player_name, position_group,
+    SELECT nhl_player_id, player_name, position_group,
         SUM(gp) AS career_games_played, SUM(goals) AS career_goals,
         SUM(assists) AS career_assists, SUM(points) AS career_points,
         ROUND(SUM(toi_seconds) / 60.0, 1) AS career_toi_minutes,
         ROUND(SUM(points)/SUM(gp), 2) AS career_ppg
     FROM `trim-icon-437420-r5.pens_interview_skater_seasons.skater_seasons`
     GROUP BY nhl_player_id, player_name, position_group
+    HAVING SUM(toi_seconds) > 10000
 
 )
 
-select *
-from source_data
-where career_games_played > 10
+SELECT *
+FROM source_data
+WHERE career_games_played > 25
+    AND nhl_player_id IS NOT NULL

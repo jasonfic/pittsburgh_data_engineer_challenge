@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: dim_skater_careers
+    description: >
+      A dimension table containing aggregated, career statistics for professional 
+      National Hockey League (NHL) skaters (forwards and defensemen, excluding goaltenders),
+      starting with the 2024 season. 
+      
+      CRITICAL FILTER NOTE: This model strictly enforces a longevity threshold. It only includes 
+      players who have competed in more than 25 total career games and logged over 10,000 seconds on ice
+      (which is the equivalent of 6.9 minutes per game - average 4th line forward minutes according to 
+      https://www.arcticicehockey.com/review-of-production-based-on-time-on-ice/ - for 25 games).
+      This filter isolates established NHLers and removes extreme outliers, such as emergency backups or short-term 
+      call-ups, whose limited sample sizes would skew rate-based efficiency metrics. It also follows the 
+      qualification criteria for the Calder Memorial Trophy (i.e., 'rookie of the year' trophy), which
+      requires that elligible 'rookie' players participate in fewer than 25 games in previous seasons.
+    columns:
+      - name: nhl_player_id
+        description: >
+          The unique numeric identification key assigned to each ndividual player by the NHL.
+          This serves as the primary key for player tracking across all seasons of their career.
+          The field is required and cannot be null.
+        tests:
+          - unique
+          - not_null
+
+      - name: player_name
+        description: >
+          The full, officially recognized name of the athlete (formatted as 'Last Name, First Name').
+
+      - name: position_group
+        description: >
+          The categorical role the player occupies on the ice. This divides skaters into 
+          'Forwards' (wingers/centers) and 'Defensemen'.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['F', 'D']
+
+      - name: career_games_played
+        description: >
+          The total number of official NHL matches the player has participated in over the course of 
+          their recorded career. To be included in this model, this count must strictly exceed 25 games.
+        tests:
+          - not_null
+
+      - name: career_goals
+        description: >
+          The cumulative sum of goals scored by each player over their entire career. 
+
+      - name: career_assists
+        description: >
+          The cumulative sum of times this player assisted a goal scored by a teammate. 
+          A maximum of two assists (Primary and Secondary) an be awarded per goal; 
+          this metric captures the player's total involvement in setting up scores.
+
+      - name: career_points
+        description: >
+          The absolute sum of a player's career goals and career assists (Points = Goals + Assists).
+
+      - name: career_toi_minutes
+        description: >
+          'Time On Ice' (TOI) expressed in total minutes, rounded to the nearest tenth. This measures 
+          the exact cumulative duration of time the player was physically on the ice during active gametime.
+          It converts raw tracking seconds into digestible minutes.
+          To be included in this model, players must have accumulated over 10,000 seconds (or 166.666 mimutes)
+          of total Time On Ice over the course of their career. This provides an additional layer of validation
+          on top of the 'career_games_played > 25' filter.
+        tests:
+          - not_null
+
+      - name: career_ppg
+        description: >
+          'Points Per Game' (PPG)—a critical rate metric tracking a player's offensive efficiency. 
+          Calculated as total career points divided by total career games played, rounded to two decimal places.
+          PPG is a highly legible statistic for new hockey fans that is more immediately understandable as an
+          efficiency metric than points-per-minute/hour/etc. It is also used more in the NHL's own internal
+          stat-tracking, as records.nhl.com allows viewers to filter the top players based on Points Per Game,
+          but not points per 60 minutes or any other time metric.
+          
+          As an example, a value of 1.00 means the player averages exactly one point (either a goal or an assist) 
+          for every game they step onto the ice. Because this metric is highly sensitive to small numbers, 
+          the model's >25 games played cutoff is vital; it ensures a player who scores 2 points in their 
+          only career game doesn't permanently display an artificially elite 2.00 PPG. The 25 game cutoff also
+          helps exclude illegible rookies who would not qualify for the Calder Trophy.
